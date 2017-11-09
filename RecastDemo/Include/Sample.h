@@ -125,6 +125,10 @@ protected:
 	bool m_filterLedgeSpans;
 	bool m_filterWalkableLowHeightSpans;
 	
+	// Camera Settings
+	float m_keyboardSpeed;
+	float m_keyboardBoostSpeed;
+
 	SampleTool* m_tool;
 	SampleToolState* m_toolStates[MAX_TOOLS];
 	
@@ -146,6 +150,7 @@ public:
 
 	virtual void handleSettings();
 	virtual void handleTools();
+	virtual void handleCamera();
 	virtual void handleDebugMode();
 	virtual void handleClick(const float* s, const float* p, bool shift);
 	virtual void handleToggle();
@@ -164,6 +169,9 @@ public:
 	virtual float getAgentRadius() { return m_agentRadius; }
 	virtual float getAgentHeight() { return m_agentHeight; }
 	virtual float getAgentClimb() { return m_agentMaxClimb; }
+	
+	virtual float getKeyboardSpeed() { return m_keyboardSpeed; }
+	virtual float getKeyboardBoostSpeed() { return m_keyboardBoostSpeed; }
 	
 	unsigned char getNavMeshDrawFlags() const { return m_navMeshDrawFlags; }
 	void setNavMeshDrawFlags(unsigned char flags) { m_navMeshDrawFlags = flags; }

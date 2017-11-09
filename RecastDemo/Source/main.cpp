@@ -159,11 +159,13 @@ int main(int /*argc*/, char** /*argv*/)
 	bool showLevels = false;
 	bool showSample = false;
 	bool showTestCases = false;
+	bool showCamera = false;
 
 	// Window scroll positions.
 	int propScroll = 0;
 	int logScroll = 0;
 	int toolsScroll = 0;
+	int cameraScroll = 0;
 	
 	string sampleName = "Choose Sample...";
 	
@@ -247,6 +249,24 @@ int main(int /*argc*/, char** /*argv*/)
 							sample->collectSettings(settings);
 
 							geom->saveGeomSet(&settings);
+						}
+					}
+					else if (event.key.keysym.sym == SDLK_v && geom && sample) {
+						float hitTime;
+						// Hit test mesh.
+						bool hit = geom->raycastMesh(rayStart, rayEnd, hitTime);
+						if (hit)
+						{
+							float logPosition[3];
+							logPosition[0] = rayStart[0] + (rayEnd[0] - rayStart[0]) * hitTime;
+							logPosition[1] = rayStart[1] + (rayEnd[1] - rayStart[1]) * hitTime;
+							logPosition[2] = rayStart[2] + (rayEnd[2] - rayStart[2]) * hitTime;
+
+							ctx.log(RC_LOG_PROGRESS, "Position at cursor is: %0.3f %0.3f %0.3f.", logPosition[0], logPosition[1], logPosition[2]);
+						}
+						else
+						{
+							ctx.log(RC_LOG_PROGRESS, "Position at cursor: Not found.");
 						}
 					}
 					break;
@@ -391,7 +411,7 @@ int main(int /*argc*/, char** /*argv*/)
 		}
 		
 		// Update sample simulation.
-		const float SIM_RATE = 20;
+		const float SIM_RATE = 60; // TODO: Make configurable.
 		const float DELTA_TIME = 1.0f / SIM_RATE;
 		timeAcc = rcClamp(timeAcc + dt, -1.0f, 1.0f);
 		int simIter = 0;
@@ -463,10 +483,10 @@ int main(int /*argc*/, char** /*argv*/)
 		moveUp		= rcClamp(moveUp	+ dt * 4 * ((keystate[SDL_SCANCODE_Q] || keystate[SDL_SCANCODE_PAGEUP	]) ? 1 : -1), 0.0f, 1.0f);
 		moveDown	= rcClamp(moveDown	+ dt * 4 * ((keystate[SDL_SCANCODE_E] || keystate[SDL_SCANCODE_PAGEDOWN	]) ? 1 : -1), 0.0f, 1.0f);
 		
-		float keybSpeed = 22.0f;
+		float keybSpeed = sample ? sample->getKeyboardSpeed() : 22.0f;
 		if (SDL_GetModState() & KMOD_SHIFT)
 		{
-			keybSpeed *= 4.0f;
+			keybSpeed *= sample ? sample->getKeyboardBoostSpeed() : 4.0f;;
 		}
 		
 		float movex = (moveRight - moveLeft) * keybSpeed * dt;
@@ -530,6 +550,9 @@ int main(int /*argc*/, char** /*argv*/)
 				showLog = !showLog;
 			if (imguiCheck("Show Tools", showTools))
 				showTools = !showTools;
+			if (imguiCheck("Show Camera Setting", showCamera))
+				showCamera = !showCamera;
+			
 
 			imguiSeparator();
 			imguiLabel("Sample");
@@ -870,6 +893,8 @@ int main(int /*argc*/, char** /*argv*/)
 		// Log
 		if (showLog && showMenu)
 		{
+			// TODO: Scroll lock to enable/disable scroll to end of file?
+			logScroll = ctx.getLogCount();
 			if (imguiBeginScrollArea("Log", 250 + 20, 10, width - 300 - 250, 200, &logScroll))
 				mouseOverMenu = true;
 			for (int i = 0; i < ctx.getLogCount(); ++i)
@@ -886,6 +911,18 @@ int main(int /*argc*/, char** /*argv*/)
 			if (sample)
 				sample->handleTools();
 			
+			imguiEndScrollArea();
+		}
+
+		// Left column camera menu
+		if (!showTestCases && showTools && showMenu && showCamera) // && geom && sample)
+		{
+			if (imguiBeginScrollArea("Camera", 250 + 20, 10 + (logScroll ? 200+20 : 0), width - 300 - 250, 200, &cameraScroll))
+				mouseOverMenu = true;
+
+			if (sample)
+				sample->handleCamera();
+
 			imguiEndScrollArea();
 		}
 		

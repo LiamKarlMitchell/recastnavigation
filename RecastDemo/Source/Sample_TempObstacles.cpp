@@ -860,7 +860,7 @@ void Sample_TempObstacles::handleSettings()
 		m_keepInterResults = !m_keepInterResults;
 
 	imguiLabel("Tiling");
-	imguiSlider("TileSize", &m_tileSize, 16.0f, 128.0f, 8.0f);
+	imguiSlider("TileSize", &m_tileSize, 128.0f, 1024.0f, 8.0f);
 	
 	int gridSize = 1;
 	if (m_geom)

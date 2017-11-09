@@ -62,7 +62,7 @@ Sample::Sample() :
 	m_navQuery(0),
 	m_crowd(0),
 	m_navMeshDrawFlags(DU_DRAWNAVMESH_OFFMESHCONS|DU_DRAWNAVMESH_CLOSEDLIST),
-	m_filterLowHangingObstacles(true),
+	m_filterLowHangingObstacles(false),
 	m_filterLedgeSpans(true),
 	m_filterWalkableLowHeightSpans(true),
 	m_tool(0),
@@ -100,6 +100,14 @@ void Sample::handleSettings()
 
 void Sample::handleTools()
 {
+}
+
+void Sample::handleCamera()
+{
+	imguiSeparator();
+	imguiLabel("Movement Speed");
+	imguiSlider("Keyboard Move", &m_keyboardSpeed, 500.0f, 1000.0f, 0.1f);
+	imguiSlider("Keyboard Boost", &m_keyboardBoostSpeed, 0.0f, 1000.0f, 0.1f);
 }
 
 void Sample::handleDebugMode()
@@ -169,27 +177,30 @@ void Sample::collectSettings(BuildSettings& settings)
 
 void Sample::resetCommonSettings()
 {
-	m_cellSize = 0.3f;
-	m_cellHeight = 0.2f;
-	m_agentHeight = 2.0f;
-	m_agentRadius = 0.6f;
-	m_agentMaxClimb = 0.9f;
-	m_agentMaxSlope = 45.0f;
-	m_regionMinSize = 8;
-	m_regionMergeSize = 20;
-	m_edgeMaxLen = 12.0f;
-	m_edgeMaxError = 1.3f;
-	m_vertsPerPoly = 6.0f;
-	m_detailSampleDist = 6.0f;
+	m_cellSize = 0.75f;
+	m_cellHeight = 0.75f;
+	m_agentHeight = 10.0f;
+	m_agentRadius = 0.8f;
+	m_agentMaxClimb = 23.8f;
+	m_agentMaxSlope = 90.0f;
+	m_regionMinSize = 1.0f;
+	m_regionMergeSize = 15.0f;
+	m_edgeMaxLen = 20.0f;
+	m_edgeMaxError = 1.5f;
+	m_vertsPerPoly = 3.0f;
+	m_detailSampleDist = 8.0f;
 	m_detailSampleMaxError = 1.0f;
 	m_partitionType = SAMPLE_PARTITION_WATERSHED;
+
+	m_keyboardSpeed = 500.0f;
+	m_keyboardBoostSpeed = 4.0f;
 }
 
 void Sample::handleCommonSettings()
 {
 	imguiLabel("Rasterization");
-	imguiSlider("Cell Size", &m_cellSize, 0.1f, 1.0f, 0.01f);
-	imguiSlider("Cell Height", &m_cellHeight, 0.1f, 1.0f, 0.01f);
+	imguiSlider("Cell Size", &m_cellSize, 0.1f, 10.0f, 0.75f);
+	imguiSlider("Cell Height", &m_cellHeight, 1.0f, 10.0f, 0.75f);
 	
 	if (m_geom)
 	{
@@ -204,15 +215,15 @@ void Sample::handleCommonSettings()
 	
 	imguiSeparator();
 	imguiLabel("Agent");
-	imguiSlider("Height", &m_agentHeight, 0.1f, 5.0f, 0.1f);
-	imguiSlider("Radius", &m_agentRadius, 0.0f, 5.0f, 0.1f);
-	imguiSlider("Max Climb", &m_agentMaxClimb, 0.1f, 5.0f, 0.1f);
+	imguiSlider("Height", &m_agentHeight, 01.0f, 100.0f, 0.1f);
+	imguiSlider("Radius", &m_agentRadius, 0.1f, 50.0f, 0.1f);
+	imguiSlider("Max Climb", &m_agentMaxClimb, 0.0f, 100.0f, 0.1f);
 	imguiSlider("Max Slope", &m_agentMaxSlope, 0.0f, 90.0f, 1.0f);
 	
 	imguiSeparator();
 	imguiLabel("Region");
-	imguiSlider("Min Region Size", &m_regionMinSize, 0.0f, 150.0f, 1.0f);
-	imguiSlider("Merged Region Size", &m_regionMergeSize, 0.0f, 150.0f, 1.0f);
+	imguiSlider("Min Region Size", &m_regionMinSize, 1.0f, 100.0f, 1.0f);
+	imguiSlider("Merged Region Size", &m_regionMergeSize, 1.0f, 100.0f, 1.0f);
 
 	imguiSeparator();
 	imguiLabel("Partitioning");
@@ -234,13 +245,13 @@ void Sample::handleCommonSettings()
 
 	imguiSeparator();
 	imguiLabel("Polygonization");
-	imguiSlider("Max Edge Length", &m_edgeMaxLen, 0.0f, 50.0f, 1.0f);
-	imguiSlider("Max Edge Error", &m_edgeMaxError, 0.1f, 3.0f, 0.1f);
-	imguiSlider("Verts Per Poly", &m_vertsPerPoly, 3.0f, 12.0f, 1.0f);		
+	imguiSlider("Max Edge Length", &m_edgeMaxLen, 0.1f, 50.0f, 20.0f);
+	imguiSlider("Max Edge Error", &m_edgeMaxError, 0.1f, 5.0f, 1.5f);
+	imguiSlider("Verts Per Poly", &m_vertsPerPoly, 3.0f, 12.0f, 3.0f);		
 
 	imguiSeparator();
 	imguiLabel("Detail Mesh");
-	imguiSlider("Sample Distance", &m_detailSampleDist, 0.0f, 16.0f, 1.0f);
+	imguiSlider("Sample Distance", &m_detailSampleDist, 1.0f, 32.0f, 8.0f);
 	imguiSlider("Max Sample Error", &m_detailSampleMaxError, 0.0f, 16.0f, 1.0f);
 	
 	imguiSeparator();
