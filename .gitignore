@@ -1,20 +1,23 @@
 ## Compiled source #
 *.com
 *.class
-*.dll
-*.exe
+#*.dll
+#*.exe
 *.ilk
 *.o
-*.pdb
+#*.pdb
 *.so
 *.idb
+*.tlog
+*.obj
+.vs
 
 ## Linux exes have no extension
 RecastDemo/Bin/RecastDemo
 RecastDemo/Bin/Tests
 
 # Build directory
-RecastDemo/Build
+#RecastDemo/Build
 
 # Ignore meshes
 RecastDemo/Bin/Meshes/*
@@ -45,3 +48,5 @@ RecastDemo/Contrib/SDL/*
 Docs/html
 
 RecastDemo/Bin/all_tiles_navmesh\.bin
+
+*.exp
